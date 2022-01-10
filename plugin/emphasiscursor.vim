@@ -12,7 +12,10 @@ if has('nvim')
 		if win_gettype(winid) == 'popup'
 			let info = get(getwininfo(winid), 0, {})
 			let num = &number ? &numberwidth : 0
-			return [info['winrow'] + line('.') - line('w0'), info['wincol'] + col('.') - 1 + num]
+			let border_size = !empty(get(nvim_win_get_config(winid), 'border', [])) ? 1 : 0
+			return [
+				\ info['winrow'] + line('.') - line('w0') + border_size,
+				\ info['wincol'] + col('.') - 1 + num + border_size]
 		else
 			return [screenrow(), screencol()]
 		endif
