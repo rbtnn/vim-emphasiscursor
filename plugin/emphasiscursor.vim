@@ -7,15 +7,51 @@ let s:ZINDEX = 100
 let s:HIGHLIGHT = 'Search'
 
 if has('nvim')
+	function! s:border_itmesize(x) abort
+		if (type('') == type(a:x)) && !empty(a:x)
+			return 1
+		elseif (type([]) == type(a:x)) && !empty(get(a:x, 0, ''))
+			return 1
+		else
+			return 0
+		endif
+	endfunction
+
 	function! s:pos() abort
 		let winid = win_getid()
 		if win_gettype(winid) == 'popup'
 			let info = get(getwininfo(winid), 0, {})
 			let num = &number ? &numberwidth : 0
-			let border_size = !empty(get(nvim_win_get_config(winid), 'border', [])) ? 1 : 0
+			let border = get(nvim_win_get_config(winid), 'border', [])
+			let border_top = 0
+			let border_left = 0
+			if type('') == type(border)
+				"call nvim_open_win(nvim_create_buf(v:false, v:true), 0, { 'relative': 'editor', 'width': 5, 'height': 5, 'row': 5, 'col': 5, 'border': 'single', })
+				let border_top = s:border_itmesize(border)
+				let border_left = s:border_itmesize(border)
+			elseif type([]) == type(border)
+				if 1 == len(border)
+					"call nvim_open_win(nvim_create_buf(v:false, v:true), 0, { 'relative': 'editor', 'width': 5, 'height': 5, 'row': 5, 'col': 5, 'border': ["*"], })
+					let border_top = s:border_itmesize(border[0])
+					let border_left = s:border_itmesize(border[0])
+				elseif 2 == len(border)
+					"call nvim_open_win(nvim_create_buf(v:false, v:true), 0, { 'relative': 'editor', 'width': 5, 'height': 5, 'row': 5, 'col': 5, 'border': ['1', '2'], })
+					let border_top = s:border_itmesize(border[1])
+					let border_left = s:border_itmesize(border[1])
+				elseif 4 == len(border)
+					"call nvim_open_win(nvim_create_buf(v:false, v:true), 0, { 'relative': 'editor', 'width': 5, 'height': 5, 'row': 5, 'col': 5, 'border': ['1', '2', '3', '4'], })
+					let border_top = s:border_itmesize(border[1])
+					let border_left = s:border_itmesize(border[3])
+				elseif 8 == len(border)
+					"call nvim_open_win(nvim_create_buf(v:false, v:true), 0, { 'relative': 'editor', 'width': 5, 'height': 5, 'row': 5, 'col': 5, 'border': ['1', '2', '3', '4','5', '6', '7', '8'], })
+					let border_top = s:border_itmesize(border[1])
+					let border_left = s:border_itmesize(border[7])
+				endif
+			endif
+			echo border_top border_left
 			return [
-				\ info['winrow'] + line('.') - line('w0') + border_size,
-				\ info['wincol'] + col('.') - 1 + num + border_size]
+				\ info['winrow'] + line('.') - line('w0') + border_top,
+				\ info['wincol'] + col('.') - 1 + num + border_left]
 		else
 			return [screenrow(), screencol()]
 		endif
