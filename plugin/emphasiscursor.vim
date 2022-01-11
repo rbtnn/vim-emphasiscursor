@@ -48,7 +48,6 @@ if has('nvim')
 					let border_left = s:border_itmesize(border[7])
 				endif
 			endif
-			echo border_top border_left
 			return [
 				\ info['winrow'] + line('.') - line('w0') + border_top,
 				\ info['wincol'] + col('.') - 1 + num + border_left]
