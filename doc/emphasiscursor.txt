@@ -1,0 +1,38 @@
+*emphasiscursor.txt*	make the cursor emphasis
+
+Author : rbtnn <naru123456789@gmail.com>
+LICENSE: MIT license (see LICENSE.txt)
+
+CONTENTS                                               *emphasiscursor-contents*
+
+Concepts                |emphasiscursor-concepts|
+Commands                |emphasiscursor-commands|
+
+
+
+==============================================================================
+Concepts                                               *emphasiscursor-concepts*
+
+* This supports Vim and Neovim.
+
+
+
+==============================================================================
+Commands                                               *emphasiscursor-commands*
+
+                                                         *:EmphasisCursor*
+:EmphasisCursor [-count={c}] [-msec={m}] [-zindex={z}] [-highlight={h}]
+
+		'count'		blink count
+				(default: 10)
+		'msec'		milliseconds in a blink
+				(default: 50)
+		'zindex'	zindex of the popupwin or floating window
+				(default: 100)
+		'highlight'	highlight of the popupwin or floating window
+				(default: 'Search')
+
+
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:noet:fen:fdl=0:

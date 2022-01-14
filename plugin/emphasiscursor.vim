@@ -1,13 +1,32 @@
 
 let g:loaded_emphasiscursor = 1
 
-let s:COUNT = 10
-let s:MSEC = 50
-let s:ZINDEX = 100
-let s:HIGHLIGHT = 'Search'
+let s:OPT_COUNT = '-count='
+let s:OPT_MSEC = '-msec='
+let s:OPT_ZINDEX = '-zindex='
+let s:OPT_HIGHLIGHT = '-highlight='
+
+function! s:init(q_args) abort
+	let s:COUNT = 10
+	let s:MSEC = 50
+	let s:ZINDEX = 100
+	let s:HIGHLIGHT = 'Search'
+	for x in split(a:q_args, '\s\+')
+		if x =~# '^' .. s:OPT_COUNT .. '\S\+$'
+			let s:COUNT = matchstr(x, '=\zs\S\+$')
+		elseif x =~# '^' .. s:OPT_MSEC .. '\S\+$'
+			let s:MSEC = matchstr(x, '=\zs\S\+$')
+		elseif x =~# '^' .. s:OPT_ZINDEX .. '\S\+$'
+			let s:ZINDEX = matchstr(x, '=\zs\S\+$')
+		elseif x =~# '^' .. s:OPT_HIGHLIGHT .. '\S\+$'
+			let s:HIGHLIGHT = matchstr(x, '=\zs\S\+$')
+		endif
+	endfor
+endfunction
 
 if has('nvim')
 	function! s:border_itmesize(x) abort
+		echo a:x
 		if (type('') == type(a:x)) && !empty(a:x)
 			return 1
 		elseif (type([]) == type(a:x)) && !empty(get(a:x, 0, ''))
@@ -48,7 +67,6 @@ if has('nvim')
 					let border_left = s:border_itmesize(border[7])
 				endif
 			endif
-			echo border_top border_left
 			return [
 				\ info['winrow'] + line('.') - line('w0') + border_top,
 				\ info['wincol'] + col('.') - 1 + num + border_left]
@@ -70,7 +88,8 @@ if has('nvim')
 			\ }
 	endfunction
 
-	function! s:emphasiscursor_start() abort
+	function! s:emphasiscursor_start(q_args) abort
+		call s:init(a:q_args)
 		let pos = s:pos()
 		" inner
 		let inner_bnr = nvim_create_buf(v:false, v:true)
@@ -105,7 +124,8 @@ if has('nvim')
 		endif
 	endfunction
 else
-	function! s:emphasiscursor_start() abort
+	function! s:emphasiscursor_start(q_args) abort
+		call s:init(a:q_args)
 		call s:emphasiscursor_inner(s:COUNT, popup_create([], {}), 0)
 	endfunction
 
@@ -128,5 +148,15 @@ else
 	endfunction
 endif
 
-command! -bar -nargs=0 EmphasisCursor :call <SID>emphasiscursor_start()
+function! EmphasisCursorComp(ArgLead, CmdLine, CursorPos) abort
+	let xs = []
+	for x in [s:OPT_COUNT, s:OPT_MSEC, s:OPT_ZINDEX, s:OPT_HIGHLIGHT]
+		if -1 == match(a:CmdLine, x)
+			let xs += [x]
+		endif
+	endfor
+	return filter(xs, { i,x -> -1 != match(x, a:ArgLead) })
+endfunction
+
+command! -nargs=* -complete=customlist,EmphasisCursorComp EmphasisCursor :call <SID>emphasiscursor_start(<q-args>)
 
